@@ -1,0 +1,23 @@
+from pathlib import Path
+LINEAR_DIR = Path(workflow.current_basedir)
+
+rule train_models:
+	input:
+		train_data = LINEAR_DIR.parent / "Data/Train_data.csv",
+		test_data = LINEAR_DIR.parent / "Data/Test_data.csv"
+
+	output:
+		top_50_genes_logistic_3m = LINEAR_DIR / "Results/top_50_genes_logistic_3m.csv",				
+		top_50_genes_logistic_18m = LINEAR_DIR / "Results/top_50_genes_logistic_18m.csv",
+		top_50_genes_logistic_24m = LINEAR_DIR / "Results/top_50_genes_logistic_24m.csv",
+		venn_logistic = LINEAR_DIR / "Results/venn_logistic.png",
+		Model_performance = LINEAR_DIR / "Results/Model_performance_lin_log.csv"
+	
+	resources:
+		mem_mb=8000
+	
+	conda:
+		str(LINEAR_DIR / "Envs/Model.yaml")
+
+	script:
+		str(LINEAR_DIR / "Scripts/Model.py")

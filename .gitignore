@@ -1,0 +1,26 @@
+#exclude from tracing
+.conda
+.snakemake
+.vscode
+
+Data/
+
+ACE/.snakemake
+ACE/Explain_Results/*.csv
+ACE/Model
+ACE/Logs
+
+LGB/.snakemake
+LGB/Results/*.csv
+LGB/Results/Analysis/*.csv
+LGB/Results/Analysis/Plots/top_gene_int_plot_*.png
+LGB/Results/Model
+LGB/Results/Parameter_optimisation
+LGB/model.txt
+
+Linear_models/.snakemake
+Linear_models/Results/*.csv
+
+Comarison/Results/
+
+

@@ -1,0 +1,13 @@
+name: Model
+channels:
+  - defaults
+  - conda-forge
+  - https://repo.anaconda.com/pkgs/main
+  - https://repo.anaconda.com/pkgs/r
+dependencies:
+  - python
+  - pandas
+  - numpy
+  - scikit-learn
+  - matplotlib
+  - matplotlib-venn

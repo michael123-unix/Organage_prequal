@@ -1,0 +1,65 @@
+from pathlib import Path
+ACE_DIR = Path(workflow.current_basedir)
+
+
+rule data_preparation:
+	input:
+		raw_data = ACE_DIR.parent / "Data/facs_processed.h5ad"
+	output:
+		train_data = ACE_DIR.parent / "Data/Train_data.h5ad",
+		test_data = ACE_DIR.parent / "Data/Test_data.h5ad"
+	conda:
+		str(ACE_DIR / "Envs/ace.yaml")
+	script:
+		str(ACE_DIR / "Scripts/Data_preparation.py")
+
+rule train_ace:
+	input: 
+		train_data = ACE_DIR.parent / "Data/Train_data.h5ad",
+		test_data = ACE_DIR.parent / "Data/Test_data.h5ad"
+	output:
+		age_dist = ACE_DIR / "Train_Results/Plots/age_dist.png",
+		violin = ACE_DIR / "Train_Results/Plots/violin.png",
+		PCA_vars = ACE_DIR / "Train_Results/Plots/PCA_vars.png",
+		umap_vars = ACE_DIR / "Train_Results/Plots/umap_vars.png",
+		umap_salient_embeddings = ACE_DIR / "Train_Results/Plots/umap_salient_embeddings.png",
+		umap_background_embeddings = ACE_DIR / "Train_Results/Plots/umap_background_embeddings.png",
+		model = directory(str(ACE_DIR / "Model/model")), 
+	resources:
+		mem_mb=12000
+	conda:
+		str(ACE_DIR / "Envs/ace.yaml")
+	script:
+		str(ACE_DIR / "Scripts/Model_train.py")	
+
+rule explain_ace:
+	input:
+		train_data = ACE_DIR.parent / "Data/Train_data.h5ad",
+		test_data = ACE_DIR.parent / "Data/Test_data.h5ad",
+		model = ACE_DIR / "Model/model"
+	output:
+		embeddings_vs_age = ACE_DIR / "Explain_Results/Plots/Embeddings_vs_age.png",
+		ridge_metrics = ACE_DIR / "Explain_Results/ridge_metrics.csv",
+		global_attributions = ACE_DIR / "Explain_Results/top_10_global_attributions.png",
+		top_50_attr_global = ACE_DIR / "Explain_Results/top_50_attr_global.csv",
+		top_50_attr_3m = ACE_DIR / "Explain_Results/top_50_attr_3m.csv",
+		top_50_attr_18m = ACE_DIR / "Explain_Results/top_50_attr_18m.csv",
+		top_50_attr_24m = ACE_DIR / "Explain_Results/top_50_attr_24m.csv",
+		attr_3m_plot = ACE_DIR / "Explain_Results/Plots/attr_3m.png",
+		attr_18m_plot = ACE_DIR / "Explain_Results/Plots/attr_18m.png",
+		attr_24m_plot = ACE_DIR / "Explain_Results/Plots/attr_24m.png",
+		top_50_corr_3m = ACE_DIR / "Explain_Results/Top_50_shap_corellations_3m.csv",
+		top_50_corr_18m = ACE_DIR / "Explain_Results/Top_50_shap_corellations_18m.csv",
+		top_50_corr_24m = ACE_DIR / "Explain_Results/Top_50_shap_corellations_24m.csv"
+	resources:
+		mem_mb=12000
+	log:
+		"Logs/explain.log"
+	conda:
+		str(ACE_DIR / "Envs/ace_explain.yaml")
+	script:
+		str(ACE_DIR / "Scripts/Analysis.py")
+
+
+
+

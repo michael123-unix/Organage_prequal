@@ -1,0 +1,65 @@
+from pathlib import Path
+LGB_DIR = Path(workflow.current_basedir) #specify wd for this file. ensures path stability if snakefile is executed from a different directory
+
+
+rule hyperparameter_optimisation:
+	input:
+		train_data = LGB_DIR.parent / "Data/Train_data.csv"
+	output: 
+		param_importance_plot = LGB_DIR / "Results/Parameter_optimisation/Plots/param_importance.png",
+		opt_hist_plot = LGB_DIR / "Results/Parameter_optimisation/Plots/opt_history.png",
+		opt_hist =LGB_DIR /  "Results/Parameter_optimisation/Optimisation_history.csv",
+		best_params = LGB_DIR / "Results/Parameter_optimisation/best_params.json"
+	resources: 
+		mem_mb=12000
+	conda:
+		str(LGB_DIR / "Envs/Organage.yaml")
+	script:
+		str(LGB_DIR / "Scripts/Hyperparam_opt.py")
+
+rule train_LGB:
+	input:
+		train_data = LGB_DIR.parent / "Data/Train_data.csv",
+		best_params = LGB_DIR / "Results/Parameter_optimisation/best_params.json"
+	output:
+		model = LGB_DIR / "model.txt",
+		model_metrics = LGB_DIR / "Results/Model/Plots/model_metrics.png"
+	resources:
+		mem_mb=12000
+	conda:
+		str(LGB_DIR / "Envs/Organage.yaml")
+	script:
+		str(LGB_DIR / "Scripts/Training.py")
+
+TOP_GENES = [0,1,2,3,4,5,6,7,8,9]
+rule explain_LGB:
+	input: 
+		train_data = LGB_DIR.parent / "Data/Train_data.csv",
+		test_data = LGB_DIR.parent / "Data/Test_data.csv",
+		model = LGB_DIR / "model.txt"
+	output:
+		Age_vs_Age_predicted = LGB_DIR / "Results/Analysis/Plots/Age_vsAge_predicted.png",
+		waterfall_3m = LGB_DIR / "Results/Analysis/Plots/Waterfall_3m.png",
+		waterfall_18m = LGB_DIR / "Results/Analysis/Plots/Waterfall_18m.png",
+		waterfall_24m = LGB_DIR / "Results/Analysis/Plots/Waterfall_24m.png",
+		beeswarm_3m = LGB_DIR / "Results/Analysis/Plots/Beeswarm_3m.png",
+		beeswarm_18m = LGB_DIR / "Results/Analysis/Plots/Beeswarm_18m.png",
+		beeswarm_24m = LGB_DIR / "Results/Analysis/Plots/Beeswarm_24m.png",
+		top_50_genes_global = LGB_DIR / "Results/Analysis/top_50_genes_global.csv",
+		top_50_genes_3m = LGB_DIR / "Results/Analysis/top_50_genes_3m.csv",
+		top_50_genes_18m = LGB_DIR / "Results/Analysis/top_50_genes_18m.csv",
+		top_50_genes_24m = LGB_DIR / "Results/Analysis/top_50_genes_24m.csv",
+		venn_top_genes = LGB_DIR / "Results/Analysis/Plots/venn_top_genes.png",
+		top_genes_scatter = expand(str(LGB_DIR / "Results/Analysis/Plots/top_gene_int_plot_{i}.png"), i= TOP_GENES),
+		top_50_interactions_3m = LGB_DIR / "Results/Top_50_interactions_3m.csv",
+		top_50_interactions_18m = LGB_DIR / "Results/Top_50_interactions_18m.csv",
+		top_50_interactions_24m = LGB_DIR / "Results/Top_50_interactions_24m.csv"
+	resources:
+		mem_mb=12000
+	conda:
+		str(LGB_DIR / "Envs/Organage.yaml")
+	script:
+		str(LGB_DIR / "Scripts/Analysis.py")
+
+
+
