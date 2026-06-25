@@ -2,7 +2,9 @@
 .conda
 .snakemake
 .vscode
+.DS_Store
 
+Logs/
 Data/
 
 ACE/.snakemake
